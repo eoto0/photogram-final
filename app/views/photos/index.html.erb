@@ -2,19 +2,24 @@
 
 <% if user_signed_in? %>
   <%= form_with model: Photo.new, url: photos_path, local: true, html: { enctype: "multipart/form-data" } do |f| %>
-    <p>
-      <%= f.label :image, "Image" %><br>
-      <%= f.file_field :image, required: true %>
-    </p>
-
-    <p>
-      <%= f.label :caption, "Caption" %><br>
-      <%= f.text_field :caption %>
-    </p>
-
-    <p>
-      <button>Add photo</button>
-    </p>
+    <table>
+      <tr>
+        <td><%= f.label :image, "Image" %></td>
+        <td><%= f.label :caption, "Caption" %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          <%= f.file_field :image, required: true %>
+        </td>
+        <td>
+          <%= f.text_area :caption, placeholder: "Enter a caption for the photo", rows: 2, cols: 40 %>
+        </td>
+        <td>
+          <button>Add photo</button>
+        </td>
+      </tr>
+    </table>
   <% end %>
 <% end %>
 
@@ -36,6 +41,8 @@
         <td style="text-align:center">
           <% if photo.image.present? %>
             <%= image_tag photo.image, width: 200, alt: "photo" %>
+          <% else %>
+            (no image)
           <% end %>
         </td>
 
@@ -47,9 +54,7 @@
 
         <td style="text-align:center"><%= photo.likes_count %></td>
 
-        <td>
-          <%= link_to "Show details", photo_path(photo) %>
-        </td>
+        <td><%= link_to "Show details", photo_path(photo) %></td>
       </tr>
     <% end %>
   </tbody>

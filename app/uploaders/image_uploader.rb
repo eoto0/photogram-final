@@ -13,6 +13,16 @@ class ImageUploader < CarrierWave::Uploader::Base
     "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
   end
 
+
+   version :thumb do
+    process resize_to_fit: [300, 300]
+  end
+
+  def extension_allowlist
+    %w(jpg jpeg gif png)
+  end
+end
+
   # Provide a default URL as a default if there hasn't been a file uploaded:
   # def default_url(*args)
   #   # For Rails 3.1+ asset pipeline compatibility:
@@ -44,4 +54,3 @@ class ImageUploader < CarrierWave::Uploader::Base
   # def filename
   #   "something.jpg"
   # end
-end

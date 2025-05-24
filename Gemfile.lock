@@ -469,6 +469,7 @@ DEPENDENCIES
   http
   importmap-rails
   jbuilder
+  mini_magick
   openai-chat
   pg (~> 1.1)
   pry-rails

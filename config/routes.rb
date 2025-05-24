@@ -1,16 +1,17 @@
 Rails.application.routes.draw do
-  get 'photos/index'
-  get 'photos/show'
-  get 'photos/create'
-  get 'photos/destroy'
+  # Devise routes for user authentication
   devise_for :users, sign_out_via: [:get, :delete]
+
+  # Root page
   root "users#index"
 
+  # Photos and nested likes/comments
   resources :photos do
+    resources :likes, only: [:create, :destroy]
     resources :comments, only: [:create, :destroy]
-    resources :likes,    only: [:create, :destroy]
   end
 
+  # Users: username as identifier
   resources :users, only: [:index, :show], param: :id do
     member do
       get :liked_photos
@@ -19,9 +20,6 @@ Rails.application.routes.draw do
     end
   end
 
+  # Follow requests
   resources :follow_requests, only: [:create, :update, :destroy]
 end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
