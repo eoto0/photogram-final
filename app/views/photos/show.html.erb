@@ -13,6 +13,20 @@
   <p><%= link_to "Delete this photo", photo_path(@photo), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %></p>
 <% end %>
 
+  <%# ----- Update Photo Form ----------------------------------------- %>
+  <h3>Update photo</h3>
+  <%= form_with model: @photo, local: true do |f| %>
+    <p>
+      <%= f.label :image, "Image" %><br>
+      <%= f.file_field :image %>
+    </p>
+    <p>
+      <%= f.label :caption, "Caption" %><br>
+      <%= f.text_field :caption, placeholder: "Enter a caption..." %>
+    </p>
+    <p><%= f.button "Update photo", type: :submit %></p>
+  <% end %>
+
 <p>Caption<br><%= @photo.caption.presence || "(no caption)" %></p>
 <p>Owner<br><%= @photo.owner.username %></p>
 <p>Posted<br><%= time_ago_in_words(@photo.created_at) %> ago</p>

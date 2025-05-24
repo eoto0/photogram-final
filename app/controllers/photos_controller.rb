@@ -29,6 +29,16 @@ class PhotosController < ApplicationController
     end
   end
 
+  def update
+    @photo = current_user.photos.find(params[:id])
+    
+    if @photo.update(photo_params)
+      redirect_to photo_path(@photo), notice: "Photo updated successfully."
+    else
+      redirect_to photo_path(@photo), alert: @photo.errors.full_messages.to_sentence
+    end
+  end
+
   def destroy
     photo = current_user.photos.find(params[:id])
     photo.destroy

@@ -25,12 +25,17 @@ def show
   end
 end
 
-  def feed
-    @user = User.find_by!(username: params[:id])
+def feed
+  @user = User.find_by!(username: params[:id])
 
-    accepted_ids = @user.sent_follow_requests.where(status: "accepted").pluck(:recipient_id)
-    @feed_photos = Photo.where(owner_id: accepted_ids).includes(:owner).order(created_at: :desc)
+  accepted_ids = @user.sent_follow_requests.where(status: "accepted").pluck(:recipient_id)
+  
+  if accepted_ids.any?
+    @photos = Photo.where(owner_id: accepted_ids).includes(:owner).order(created_at: :desc)
+  else
+    @photos = Photo.none
   end
+end
 
   def liked_photos
     @user = User.find_by!(username: params[:id])
