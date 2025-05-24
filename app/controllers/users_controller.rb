@@ -6,27 +6,28 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.find_by!(username: params[:id])  # 🔁 UPDATED
+    @user = User.find_by!(username: params[:id])
+    @own_photos = @user.photos.order(created_at: :desc)
 
-    is_owner    = current_user == @user
-    is_public   = !@user.private?
-    is_follower = FollowRequest.exists?(sender: current_user, recipient: @user, status: "accepted")
+    # Check if the visitor is the profile owner
+    is_owner = current_user == @user
+    is_public = !@user.private?
+    is_follower = current_user &&
+      FollowRequest.exists?(
+        sender: current_user,
+        recipient: @user,
+        status: "accepted"
+      )
 
-    if is_public || is_owner || is_follower
-      @own_photos = @user.photos.order(created_at: :desc)
-      @can_view_profile = true
+    @can_view_profile = is_owner || is_public || is_follower
 
-      if is_owner
-        @pending_follow_requests = @user.received_follow_requests.where(status: "pending")
-      end
-    else
-      @can_view_profile = false
+    if is_owner
+      @pending_follow_requests = @user.received_follow_requests.where(status: "pending")
     end
   end
 
   def feed
-    @user = User.find_by!(username: params[:id])  # 🔁 UPDATED
-
+    @user = User.find_by!(username: params[:id])
     accepted_ids = @user.sent_follow_requests
                         .where(status: "accepted")
                         .pluck(:recipient_id)
@@ -38,11 +39,8 @@ class UsersController < ApplicationController
   end
 
   def discover
-    @user = User.find_by!(username: params[:id])  # 🔁 UPDATED
-
-    followed_user_ids = @user.following
-                             .where(follow_requests: { status: "accepted" })
-                             .pluck(:id)
+    @user = User.find_by!(username: params[:id])
+    followed_user_ids = @user.following.where(follow_requests: { status: "accepted" }).pluck(:id)
 
     @discovery_photos = Photo
                           .joins(:likes)

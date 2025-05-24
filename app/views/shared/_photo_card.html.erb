@@ -1,6 +1,6 @@
 <tr>
   <td style="text-align:center">
-    <% if photo.image.present? %>
+    <% if photo.image.present? && photo.image.strip != "" %>
       <%= image_tag photo.image, width: 200, alt: "photo" %>
     <% else %>
       (no image)

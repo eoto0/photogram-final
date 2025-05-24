@@ -19,7 +19,6 @@
       <td>Action</td>
       <td>
         <% existing = current_user.sent_follow_requests.find_by(recipient: @user) %>
-
         <% if existing&.accepted? %>
           <%= link_to "Unfollow", follow_request_path(existing), data: { turbo_method: :delete } %>
         <% elsif existing&.pending? %>
@@ -32,7 +31,7 @@
   <% end %>
 </table>
 
-<%# Show pending follow requests if the user is viewing their own profile %>
+<%# Show pending follow requests if this is your profile %>
 <% if user_signed_in? && current_user == @user && @pending_follow_requests.any? %>
   <h4>Pending follow requests</h4>
   <ul>
@@ -53,8 +52,9 @@
   <li><%= link_to "Discover", discover_user_path(@user) %></li>
 </ul>
 
+<h2>Own photos (<%= @user.photos.count %>)</h2>
+
 <% if @can_view_profile %>
-  <h2>Own photos (<%= @own_photos.count %>)</h2>
   <table border="1" width="100%">
     <thead>
       <tr>
@@ -67,7 +67,22 @@
       </tr>
     </thead>
     <tbody>
-      <%= render partial: "shared/photo_card", collection: @own_photos, as: :photo %>
+      <% @user.photos.order(created_at: :desc).each do |photo| %>
+        <tr>
+          <td style="text-align:center">
+            <% if photo.image.attached? %>
+              <%= image_tag photo.image, width: 200 %>
+            <% else %>
+              (no image)
+            <% end %>
+          </td>
+          <td><%= photo.owner.username %></td>
+          <td><%= photo.caption.presence || "(no caption)" %></td>
+          <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+          <td style="text-align:center"><%= photo.likes_count %></td>
+          <td><%= link_to "Show details", photo_path(photo) %></td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 <% else %>
