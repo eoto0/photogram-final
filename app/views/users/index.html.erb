@@ -1,17 +1,52 @@
 <h1>List of users</h1>
 
 <table border="1">
-  <tr>
-    <th>Username</th>
-    <th>Private?</th>
-    <th></th>
-  </tr>
-
-  <% @users.each do |u| %>
+  <thead>
     <tr>
-      <td><%= u.username %></td>
-      <td><%= u.private? ? "Yes" : "No" %></td>
-      <td><%= link_to "Show details", user_path(u) %></td>
+      <th>Username</th>
+      <th>Private?</th>
+      <th></th>
+      <th></th>
     </tr>
+  </thead>
+
+   <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.username %></td>
+        <td><%= user.private? ? "Yes" : "No" %></td>
+
+       <td>
+  <%# 1. Skip for guests or for the row that belongs to the viewer -------- %>
+  <% if current_user.nil? || user == current_user %>
+    <!-- leave cell blank -->
+
+  <%# 2. Does the viewer already have a follow-request? ------------------- %>
+  <% elsif (fr = current_user.sent_follow_requests.find_by(recipient: user)) %>
+
+      <% if fr.pending? %>
+        Request sent.
+        <%= link_to "Cancel",
+                    follow_request_path(fr),
+                    data: { turbo_method: :delete } %>
+
+      <% else %> <%# accepted %>
+        <%= link_to "Unfollow",
+                    follow_request_path(fr),
+                    data: { turbo_method: :delete } %>
+      <% end %>
+
+  <%# 3. No request yet  →  show a **button** ----------------------------- %>
+  <% else %>
+    <%= button_to "Follow",
+                  follow_requests_path(recipient_id: user.id),
+                  method: :post,
+                  form:   { data: { turbo_frame: "_top" } } %>
   <% end %>
+</td>
+
+        <td><%= link_to "Show details", user_path(user) %></td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>

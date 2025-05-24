@@ -15,8 +15,9 @@
 #  index_follow_requests_on_sender_id     (sender_id)
 #
 class FollowRequest < ApplicationRecord
-    STATUSES = %w[pending accepted rejected]
-  validates :status, inclusion: { in: STATUSES }
+  enum status: { pending: "pending", accepted: "accepted", rejected: "rejected" }
+
+
   validates :recipient_id, uniqueness: { scope: :sender_id }
 
   belongs_to :sender,    class_name: "User",
