@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   get 'photos/create'
   get 'photos/destroy'
   devise_for :users
-  root "photos#index"
+  root "users#index"
 
   resources :photos do
     resources :comments, only: [:create, :destroy]
