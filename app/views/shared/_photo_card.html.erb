@@ -1,8 +1,19 @@
-<li>
-  <%# Simple URL stored in photo.image %>
-  <%= image_tag photo.image, width: 200 if photo.image.present? %><br>
+<tr>
+  <td style="text-align:center">
+    <% if photo.image.present? %>
+      <%= image_tag photo.image, width: 200, alt: "photo" %>
+    <% else %>
+      (no image)
+    <% end %>
+  </td>
 
-  <%= photo.caption.presence || "(no caption)" %><br>
-  posted by <%= link_to photo.owner.username, user_path(photo.owner) %>
-  <br>
-</li>
+  <td><%= photo.owner.username %></td>
+
+  <td><%= photo.caption.presence || "(no caption)" %></td>
+
+  <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+
+  <td style="text-align:center"><%= photo.likes_count %></td>
+
+  <td><%= link_to "Show details", photo_path(photo) %></td>
+</tr>

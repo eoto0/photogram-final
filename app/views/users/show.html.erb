@@ -1,26 +1,61 @@
 <h1><%= @user.username %></h1>
 
-<p>
-  Account is <%= @user.private? ? "PRIVATE" : "PUBLIC" %>.
-</p>
+<table>
+  <tr>
+    <td>Private</td>
+    <td><%= @user.private? %></td>
+  </tr>
+  <tr>
+    <td>Followers</td>
+    <td><%= @user.received_follow_requests.where(status: "accepted").count %></td>
+  </tr>
+  <tr>
+    <td>Following</td>
+    <td><%= @user.sent_follow_requests.where(status: "accepted").count %></td>
+  </tr>
+  <% if user_signed_in? && current_user != @user %>
+    <tr>
+      <td>Action</td>
+      <td>
+        <% existing = current_user.sent_follow_requests.find_by(recipient: @user) %>
 
-<h2>Photos by <%= @user.username %></h2>
+        <% if existing&.accepted? %>
+          <%= link_to "Unfollow", follow_request_path(existing), data: { turbo_method: :delete } %>
+        <% elsif existing&.pending? %>
+          Request sent. <%= link_to "Cancel", follow_request_path(existing), data: { turbo_method: :delete } %>
+        <% else %>
+          <%= button_to "Follow", follow_requests_path(recipient_id: @user.id), method: :post %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
 
 <ul>
-  <%= render partial: "shared/photo_card",
-             collection: @own_photos, as: :photo %>
+  <li><%= link_to "Profile", user_path(@user) %></li>
+  <li><%= link_to "Liked photos", liked_photos_user_path(@user) %></li>
+  <li><%= link_to "Feed", feed_user_path(@user) %></li>
+  <li><%= link_to "Discover", discover_user_path(@user) %></li>
 </ul>
 
-<% if user_signed_in? && current_user != @user %>
-  <% existing = current_user.sent_follow_requests.
-                 find_by(recipient: @user) %>
+<% if @can_view_profile %>
+  <h2>Own photos (<%= @own_photos.count %>)</h2>
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th width="20%">Image</th>
+        <th width="10%">Owner</th>
+        <th>Caption</th>
+        <th width="10%">Posted</th>
+        <th width="5%">Likes</th>
+        <th width="8%"></th>
+      </tr>
+    </thead>
 
-  <% if existing&.accepted? %>
-    <p>You are following <%= @user.username %>.</p>
-  <% elsif existing&.pending? %>
-    <p>Follow request pending…</p>
-  <% else %>
-    <%= button_to "Follow", follow_requests_path(recipient_id: @user.id),
-                  method: :post %>
-  <% end %>
+    <tbody>
+      <%= render partial: "shared/photo_card", collection: @own_photos, as: :photo %>
+    </tbody>
+  </table>
+<% else %>
+  <p>This account is private. You must be following to see their photos.</p>
 <% end %>

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:index, :show], param: :id do
     member do
+      get :liked_photos
       get :feed
       get :discover
     end

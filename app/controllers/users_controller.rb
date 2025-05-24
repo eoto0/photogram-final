@@ -6,16 +6,24 @@ class UsersController < ApplicationController
     @users = User.order(:username)
   end
 
-  def show
-    @user       = User.find(params[:id])
-    @own_photos = @user.photos.order(created_at: :desc)
+def show
+  @user = User.find(params[:id])
 
-    # pending requests only relevant when viewer == user
-    if user_signed_in? && current_user == @user
+  is_owner = current_user == @user
+  is_public = !@user.private?
+  is_follower = FollowRequest.exists?(sender: current_user, recipient: @user, status: "accepted")
+
+  if is_public || is_owner || is_follower
+    @own_photos = @user.photos.order(created_at: :desc)
+    @can_view_profile = true
+
+    if is_owner
       @pending_follow_requests = @user.received_follow_requests.where(status: "pending")
     end
+  else
+    @can_view_profile = false
   end
-
+end
   # --------------------------------------------------------------------------
   # Extra pages the spec checks
   # --------------------------------------------------------------------------

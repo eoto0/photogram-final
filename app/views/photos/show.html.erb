@@ -1,74 +1,36 @@
 <h1>Photo Details</h1>
 
-<table border="1" width="100%" style="margin-bottom: 1em;">
-  <tbody>
-    <!-- Image -->
-    <tr>
-      <th>Image</th>
-      <td style="text-align:center">
-        <% if @photo.image.present? %>
-          <%= image_tag @photo.image, width: 400, alt: "photo" %>
-        <% else %>
-          (no image)
-        <% end %>
-      </td>
-    </tr>
+<%# ----- Image -------------------------------------------------------- %>
+<p>Image</p>
+<% if @photo.image.present? %>
+  <%= image_tag @photo.image, alt: "Photo", width: 400 %>
+<% else %>
+  <p>(no image)</p>
+<% end %>
 
-    <!-- Caption -->
-    <tr>
-      <th>Caption</th>
-      <td><%= @photo.caption.presence || "(no caption)" %></td>
-    </tr>
+<p>Caption<br><%= @photo.caption.presence || "(no caption)" %></p>
+<p>Owner<br><%= @photo.owner.username %></p>
+<p>Posted<br><%= time_ago_in_words(@photo.created_at) %> ago</p>
+<p>Likes count<br><%= @photo.likes_count %></p>
+<p>Comments count<br><%= @photo.comments_count %></p>
+<p>Fans<br><%= @photo.likes.map { |l| l.fan.username }.to_sentence %></p>
 
-    <!-- Owner -->
-    <tr>
-      <th>Owner</th>
-      <td><%= @photo.owner.username %></td>
-    </tr>
+<%# ----- Like / Unlike ------------------------------------------------ %>
+<% if user_signed_in? %>
+  <p>Add a fan<br>
+    <% existing_like = @photo.likes.find_by(fan: current_user) %>
+    <% if existing_like %>
+      <%= link_to "Unlike", photo_like_path(@photo, existing_like), data: { turbo_method: :delete } %>
+    <% else %>
+      <%= button_to "Like", photo_likes_path(@photo), method: :post %>
+    <% end %>
+  </p>
+<% end %>
 
-    <!-- Posted -->
-    <tr>
-      <th>Posted</th>
-      <td><%= time_ago_in_words(@photo.created_at) %> ago</td>
-    </tr>
-
-    <!-- Likes count -->
-    <tr>
-      <th>Likes count</th>
-      <td><%= @photo.likes_count %></td>
-    </tr>
-
-    <!-- Comments count -->
-    <tr>
-      <th>Comments count</th>
-      <td><%= @photo.comments_count %></td>
-    </tr>
-
-    <!-- Fans (usernames of everybody who’s liked it) -->
-    <tr>
-      <th>Fans</th>
-      <td><%= @photo.likes.map { |l| l.fan.username }.to_sentence %></td>
-    </tr>
-
-    <!-- Add a fan / remove a fan -->
-    <tr>
-      <th>Add a fan</th>
-      <td>
-        <% if user_signed_in? %>
-          <% existing_like = @photo.likes.find_by(fan: current_user) %>
-          <% if existing_like %>
-            <%= link_to "Unlike", photo_like_path(@photo, existing_like), method: :delete %>
-          <% else %>
-            <%= button_to "Like", photo_likes_path(@photo), method: :post %>
-          <% end %>
-        <% end %>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+<%# ----- Comments Section -------------------------------------------- %>
 <h2>Comments</h2>
-<table border="1" width="100%">
+
+<table>
   <thead>
     <tr>
       <th>Commenter</th>
@@ -77,12 +39,24 @@
     </tr>
   </thead>
   <tbody>
-    <% @comments.each do |c| %>
+    <% @comments.each do |comment| %>
       <tr>
-        <td><%= c.author.username %></td>
-        <td><%= c.body %></td>
-        <td><%= time_ago_in_words(c.created_at) %> ago</td>
+        <td><%= comment.author.username %></td>
+        <td><%= comment.body %></td>
+        <td><%= time_ago_in_words(comment.created_at) %> ago</td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%# ----- New Comment Form -------------------------------------------- %>
+<% if user_signed_in? %>
+  <h3>Add a new comment</h3>
+  <%= form_with model: [@photo, @new_comment], local: true do |f| %>
+    <p>
+      <%= f.label :body, "Comment" %><br>
+      <%= f.text_field :body, placeholder: "Enter a comment..." %>
+    </p>
+    <p><%= f.submit "Add comment" %></p>
+  <% end %>
+<% end %>
