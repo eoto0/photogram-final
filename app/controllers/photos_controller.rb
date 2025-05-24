@@ -13,7 +13,7 @@ class PhotosController < ApplicationController
   def show
     @photo     = Photo.find(params[:id])
     @comments  = @photo.comments.includes(:author)
-    @new_like  = Like.new
+    @fans  = @photo.fans
     @new_comment = Comment.new
   end
 
