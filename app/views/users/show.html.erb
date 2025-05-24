@@ -1,0 +1,26 @@
+<h1><%= @user.username %></h1>
+
+<p>
+  Account is <%= @user.private? ? "PRIVATE" : "PUBLIC" %>.
+</p>
+
+<h2>Photos by <%= @user.username %></h2>
+
+<ul>
+  <%= render partial: "shared/photo_card",
+             collection: @own_photos, as: :photo %>
+</ul>
+
+<% if user_signed_in? && current_user != @user %>
+  <% existing = current_user.sent_follow_requests.
+                 find_by(recipient: @user) %>
+
+  <% if existing&.accepted? %>
+    <p>You are following <%= @user.username %>.</p>
+  <% elsif existing&.pending? %>
+    <p>Follow request pending…</p>
+  <% else %>
+    <%= button_to "Follow", follow_requests_path(recipient_id: @user.id),
+                  method: :post %>
+  <% end %>
+<% end %>

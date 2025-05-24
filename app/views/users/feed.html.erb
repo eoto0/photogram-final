@@ -1,0 +1,6 @@
+<h1><%= @user.username %> — Feed</h1>
+
+<ul>
+  <%= render partial: "shared/photo_card",
+             collection: @feed_photos, as: :photo %>
+</ul>

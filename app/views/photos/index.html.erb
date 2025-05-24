@@ -1,2 +1,16 @@
-<h1>Photos#index</h1>
-<p>Find me in app/views/photos/index.html.erb</p>
+<h1>Public photos</h1>
+
+<ul>
+  <%= render partial: "shared/photo_card",
+             collection: @photos, as: :photo %>
+</ul>
+
+<% if user_signed_in? %>
+  <h2>Upload a new photo</h2>
+  <%= form_with model: Photo.new, url: photos_path, local: true,
+                html: { multipart: true } do |f| %>
+    <p>Image: <%= f.file_field :image %></p>
+    <p>Caption: <%= f.text_field :caption %></p>
+    <%= f.submit "Create photo" %>
+  <% end %>
+<% end %>

@@ -1,2 +1,41 @@
-<h1>Photos#show</h1>
-<p>Find me in app/views/photos/show.html.erb</p>
+<h1>Photo by <%= link_to @photo.owner.username, user_path(@photo.owner) %></h1>
+
+<%= image_tag @photo.image if @photo.image.attached? %>
+<p><%= @photo.caption %></p>
+
+<p><%= @photo.likes_count %> likes, <%= @photo.comments_count %> comments</p>
+
+<%# ----- Like / Unlike ------------------------------------------------ %>
+<% if user_signed_in? %>
+  <% existing_like = @photo.likes.find_by(fan: current_user) %>
+  <% if existing_like %>
+    <%= button_to "Unlike",
+                  photo_like_path(@photo, existing_like),
+                  method: :delete %>
+  <% else %>
+    <%= button_to "Like", photo_likes_path(@photo), method: :post %>
+  <% end %>
+<% end %>
+
+<%# ----- Comment list ------------------------------------------------- %>
+<h2>Comments</h2>
+<ul>
+  <% @comments.each do |c| %>
+    <li>
+      <%= c.body %> — <%= c.author.username %>
+      <% if c.author == current_user %>
+        <%= button_to "Delete",
+                      photo_comment_path(@photo, c),
+                      method: :delete %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<%# ----- New comment form -------------------------------------------- %>
+<% if user_signed_in? %>
+  <%= form_with model: [@photo, Comment.new], local: true do |f| %>
+    <%= f.text_field :body, placeholder: "Write a comment…" %>
+    <%= f.submit "Post" %>
+  <% end %>
+<% end %>
