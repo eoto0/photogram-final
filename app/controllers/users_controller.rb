@@ -25,6 +25,34 @@ def show
   end
 end
 
+  def edit
+  # Check if the user is trying to edit their own profile
+  @user = User.find_by!(username: params[:id])
+  
+  # Only allow users to edit their own profile
+  unless current_user == @user
+    redirect_to root_path, alert: "You can only edit your own profile."
+    return
+  end
+end
+
+def update
+  # Check if the user is trying to update their own profile
+  @user = User.find_by!(username: params[:id])
+  
+  # Only allow users to update their own profile
+  unless current_user == @user
+    redirect_to root_path, alert: "You can only edit your own profile."
+    return
+  end
+  
+  if @user.update(user_params)
+    redirect_to user_path(@user), notice: "Profile updated successfully."
+  else
+    render :edit, alert: "Error updating profile."
+  end
+end
+
 def feed
   @user = User.find_by!(username: params[:id])
 
