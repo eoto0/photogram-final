@@ -8,6 +8,11 @@
   <p>(no image)</p>
 <% end %>
 
+<%# ----- Delete Link (only for owner) --------------------------------- %>
+<% if user_signed_in? && current_user == @photo.owner %>
+  <p><%= link_to "Delete this photo", photo_path(@photo), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %></p>
+<% end %>
+
 <p>Caption<br><%= @photo.caption.presence || "(no caption)" %></p>
 <p>Owner<br><%= @photo.owner.username %></p>
 <p>Posted<br><%= time_ago_in_words(@photo.created_at) %> ago</p>
