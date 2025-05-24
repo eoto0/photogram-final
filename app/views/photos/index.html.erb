@@ -1,16 +1,47 @@
-<h1>Public photos</h1>
+<h1>List of photos</h1>
 
-<ul>
-  <%= render partial: "shared/photo_card",
-             collection: @photos, as: :photo %>
-</ul>
+<table border="1" width="100%">
+  <thead>
+    <tr>
+      <th width="20%">Image</th>
+      <th>Caption</th>
+      <th width="10%">Owner</th>
+      <th width="10%">Posted</th>
+      <th width="5%">Likes</th>
+      <th width="8%"></th>
+    </tr>
+  </thead>
 
-<% if user_signed_in? %>
-  <h2>Upload a new photo</h2>
-  <%= form_with model: Photo.new, url: photos_path, local: true,
-                html: { multipart: true } do |f| %>
-    <p>Image: <%= f.file_field :image %></p>
-    <p>Caption: <%= f.text_field :caption %></p>
-    <%= f.submit "Create photo" %>
-  <% end %>
-<% end %>
+  <tbody>
+    <% @photos.each do |photo| %>
+      <tr>
+        <!-- image (URL stored in photos.image) -->
+        <td style="text-align:center">
+          <% if photo.image.present? %>
+            <%= image_tag photo.image, width: 200, alt: "photo" %>
+          <% end %>
+        </td>
+
+        <!-- caption -->
+        <td><%= photo.caption.presence || "(no caption)" %></td>
+
+        <!-- owner username (link to user details) -->
+        <td>
+          <%= link_to photo.owner.username,
+                      user_path(photo.owner) %>
+        </td>
+
+        <!-- posted time -->
+        <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+
+        <!-- likes count (already cached in likes_count) -->
+        <td style="text-align:center"><%= photo.likes_count %></td>
+
+        <!-- show details link -->
+        <td>
+          <%= link_to "Show details", photo_path(photo) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

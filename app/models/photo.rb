@@ -18,7 +18,7 @@
 class Photo < ApplicationRecord
   belongs_to :owner, class_name: "User", counter_cache: true
 
-  has_one_attached :image
+  # has_one_attached :image
   validates :image, presence: true
 
   has_many :comments, dependent: :destroy

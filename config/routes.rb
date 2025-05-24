@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get 'photos/show'
   get 'photos/create'
   get 'photos/destroy'
-  devise_for :users
+  devise_for :users, sign_out_via: [:get, :delete]
   root "users#index"
 
   resources :photos do
