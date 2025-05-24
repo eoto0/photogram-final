@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :follow_requests, only: [:create, :destroy]
+  resources :follow_requests, only: [:create, :update, :destroy]
 end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

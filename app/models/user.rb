@@ -32,6 +32,10 @@ class User < ApplicationRecord
 
   validates :username, presence: true, uniqueness: { case_sensitive: false }
 
+  def to_param
+  username
+end
+
   has_many :photos,       foreign_key: "owner_id", dependent: :destroy
   has_many :comments,     foreign_key: "author_id", dependent: :destroy
   has_many :likes,        foreign_key: "fan_id",    dependent: :destroy

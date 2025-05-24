@@ -1,5 +1,23 @@
 <h1>List of photos</h1>
 
+<% if user_signed_in? %>
+  <%= form_with model: Photo.new, url: photos_path, local: true, html: { enctype: "multipart/form-data" } do |f| %>
+    <p>
+      <%= f.label :image, "Image" %><br>
+      <%= f.file_field :image, required: true %>
+    </p>
+
+    <p>
+      <%= f.label :caption, "Caption" %><br>
+      <%= f.text_field :caption %>
+    </p>
+
+    <p>
+      <button>Add photo</button>
+    </p>
+  <% end %>
+<% end %>
+
 <table border="1" width="100%">
   <thead>
     <tr>
@@ -15,29 +33,23 @@
   <tbody>
     <% @photos.each do |photo| %>
       <tr>
-        <!-- image (we only have a URL string) -->
         <td style="text-align:center">
           <% if photo.image.present? %>
             <%= image_tag photo.image, width: 200, alt: "photo" %>
-          <% else %>
-            (no image)
           <% end %>
         </td>
 
-        <!-- caption -->
         <td><%= photo.caption.presence || "(no caption)" %></td>
 
-        <!-- owner username (no link here if you don’t want one) -->
         <td><%= photo.owner.username %></td>
 
-        <!-- posted time -->
         <td><%= time_ago_in_words(photo.created_at) %> ago</td>
 
-        <!-- likes count -->
         <td style="text-align:center"><%= photo.likes_count %></td>
 
-        <!-- show details link -->
-        <td><%= link_to "Show details", photo_path(photo) %></td>
+        <td>
+          <%= link_to "Show details", photo_path(photo) %>
+        </td>
       </tr>
     <% end %>
   </tbody>

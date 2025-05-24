@@ -20,18 +20,25 @@ class FollowRequestsController < ApplicationController
 
   # PATCH /follow_requests/:id
   def update
-    req   = current_user.received_follow_requests.find(params[:id])
-    action = params[:accept] == "true" ? "accepted" : "rejected"
-    req.update(status: action)
+    request = current_user.received_follow_requests.find(params[:id])
 
-    redirect_back fallback_location: user_path(current_user),
-                  notice: "Follow request #{action}."
+    if %w[accepted rejected].include?(params[:status])
+      request.update(status: params[:status])
+      redirect_back fallback_location: user_path(current_user), notice: "Follow request #{params[:status]}."
+    else
+      redirect_back fallback_location: user_path(current_user), alert: "Invalid status."
+    end
   end
 
   # DELETE /follow_requests/:id
- def destroy
-    request = current_user.sent_follow_requests.find(params[:id])
-    request.destroy
-    redirect_back fallback_location: users_path, notice: "Relationship removed."
+  def destroy
+    request = FollowRequest.find(params[:id])
+
+    if request.sender == current_user || request.recipient == current_user
+      request.destroy
+      redirect_back fallback_location: users_path, notice: "Relationship removed."
+    else
+      redirect_back fallback_location: root_path, alert: "Not authorized."
+    end
   end
 end

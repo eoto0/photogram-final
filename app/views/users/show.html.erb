@@ -13,6 +13,7 @@
     <td>Following</td>
     <td><%= @user.sent_follow_requests.where(status: "accepted").count %></td>
   </tr>
+
   <% if user_signed_in? && current_user != @user %>
     <tr>
       <td>Action</td>
@@ -30,6 +31,20 @@
     </tr>
   <% end %>
 </table>
+
+<%# Show pending follow requests if the user is viewing their own profile %>
+<% if user_signed_in? && current_user == @user && @pending_follow_requests.any? %>
+  <h4>Pending follow requests</h4>
+  <ul>
+    <% @pending_follow_requests.each do |request| %>
+      <li>
+        <%= request.sender.username %>
+        <%= button_to "Accept", follow_request_path(request, status: "accepted"), method: :patch %>
+        <%= button_to "Reject", follow_request_path(request, status: "rejected"), method: :patch %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
 
 <ul>
   <li><%= link_to "Profile", user_path(@user) %></li>
@@ -51,7 +66,6 @@
         <th width="8%"></th>
       </tr>
     </thead>
-
     <tbody>
       <%= render partial: "shared/photo_card", collection: @own_photos, as: :photo %>
     </tbody>
